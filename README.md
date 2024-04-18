@@ -1,5 +1,10 @@
-# [AwesomePictureMusic](https://github.com/Yanyutin753/AwesomePictureMusic)
-A python plugin for [Chatgpt On Wechat](https://github.com/zhayujie/chatgpt-on-wechat)
+<div align="center">
+
+# [🤩AwesomePictureMusic](https://github.com/Yanyutin753/AwesomePictureMusic)
+### 🎖️A python plugin for [Chatgpt On Wechat](https://github.com/zhayujie/chatgpt-on-wechat)，实现文本、图像、音乐和表情包之间相互转化，融合各种AI技术以构建丰富多变的工作流，为用户带来了充满惊喜的互动体验，同时也深度探索了AI的无限可能性！
+
+<br>
+</div>
 
 **项目指南**
 
