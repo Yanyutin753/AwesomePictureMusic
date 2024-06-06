@@ -27,6 +27,7 @@ def on_image_reply(request_bot_name, image_type, all_seeds, modelname, minutes, 
                       .format(request_bot_name, f"{image_type}/{seed}", modelname, composition_2))
     replyText += ("\n\n🥰 温馨提示\n✨ 1:左上 2:右上 3:左下 4:右下\n👑 MODEL_1 : 动漫\n🏆 MODEL_2 : 现实\n🧩 MODEL_3 : Q版\n🌈 "
                   f"图片不满意的话，点击变换\n{request_bot_name}帮你再画一幅吧!\n💖 感谢您的使用！")
+    return replyText
 
 
 # 用于主函数的帮助回复
@@ -46,3 +47,4 @@ def on_help_reply(trigger, rules):
     help_text += (
         "🥰发送 '一张图片'，我将为您进行图片操作\n"
     )
+    return help_text
