@@ -1,0 +1,207 @@
+import os
+import urllib
+from datetime import time
+
+import requests
+
+import plugins.pictureChange.message.message_handle as Baidu_Image
+import plugins.pictureChange.message.message_sd_reply as SDReply
+import plugins.pictureChange.util.baidu_image as Baidu_Image
+from bridge.context import ContextType
+from common.log import logger
+from plugins import EventAction
+from plugins.pictureChange import util
+from plugins.pictureChange.message import message_reply as MessageReply
+from plugins.pictureChange.message import message_type
+from plugins.pictureChange.message import message_type as MessageHandle
+from plugins.pictureChange.util import file_handle
+
+
+def process_image_content(openai_api_base, openai_api_key, image_recognize_model, prompt, recognize_func,
+                          error_message, reply_message_method, e_context):
+    context = e_context['context']
+    session_id = context.kwargs.get('session_id')
+    file_content = context.content.strip().split()[2]
+    if os.path.isfile(file_content):
+        try:
+            file_url = file_handle.file_toBase64(file_content)
+            logger.info(file_url)
+            replyText = recognize_func(openai_api_base + "/chat/completions",
+                                       openai_api_key, prompt, file_url,
+                                       image_recognize_model, session_id)
+        except Exception as e:
+            replyText = error_message
+            logger.error("Processing failed: {}".format(str(e)))
+        finally:
+            reply_message_method(True, replyText, e_context)
+    else:
+        replyText = error_message
+        reply_message_method(True, replyText, e_context)
+
+
+def process_file_content(openai_api_base, openai_api_key, file_recognize_model, prompt, recognize_func,
+                         error_message,
+                         reply_message_method,
+                         e_context):
+    context = e_context['context']
+    session_id = context.kwargs.get('session_id')
+    file_content = context.content.strip()
+    if os.path.isfile(file_content):
+        try:
+            file_url = file_handle.file_toBase64(file_content)
+            logger.info(file_url)
+            replyText = recognize_func(openai_api_base + "/chat/completions",
+                                       openai_api_key, prompt, file_url,
+                                       file_recognize_model, session_id)
+        except Exception as e:
+            replyText = error_message
+            logger.error("Processing failed: {}".format(str(e)))
+        finally:
+            reply_message_method(True, replyText, e_context)
+    else:
+        replyText = error_message
+        reply_message_method(True, replyText, e_context)
+
+
+class Common:
+
+    @staticmethod
+    def process_image(openai_api_base, openai_api_key, image_recognize_model, image_recognize_prompt, e_context):
+        process_image_content(openai_api_base, openai_api_key, image_recognize_model,
+                              image_recognize_prompt, util.recognize_image,
+                              "🥰请先发送图片给我,我将为您进行图像分析",
+                              MessageReply.reply_Text_Message, e_context)
+
+    @staticmethod
+    def process_file(openai_api_base, openai_api_key, file_recognize_model, file_recognize_prompt, e_context):
+        process_file_content(openai_api_base, openai_api_key, file_recognize_model,
+                             file_recognize_prompt, util.recognize_file,
+                             "🥰请先发送文件给我,我将为您进行文件分析",
+                             MessageReply.reply_Text_Message, e_context)
+
+    @staticmethod
+    def process_image_create(is_use_fanyi, bot_prompt, rules, Model, request_bot_name, start_args, params, options,
+                             e_context):
+        try:
+            context = e_context['context']
+            content = MessageHandle.init_content(e_context)
+            session_id = context.kwargs.get('session_id')
+
+            text = "🚀图片生成中～～～\n⏳请您耐心等待1-2分钟\n✨请稍等片刻✨✨\n❤️感谢您的耐心与支持"
+            MessageReply.tem_reply_Text_Message(text, e_context)
+
+            SDReply.create_Image(content, is_use_fanyi, bot_prompt, rules, Model, request_bot_name, start_args, params,
+                                 options, session_id, e_context)
+        except Exception as e:
+            raise RuntimeError(f"图片处理发生错误: {e}") from e
+
+    @staticmethod
+    def process_image_custom(is_use_fanyi, bot_prompt, Model, request_bot_name, start_args, params,
+                             negative_prompt, maxsize: int, e_context):
+        try:
+            context = e_context['context']
+            content = MessageHandle.init_content(e_context)
+            session_id = context.kwargs.get('session_id')
+
+            text = "🚀图片生成中～～～\n⏳请您耐心等待1-2分钟\n✨请稍等片刻✨✨\n❤️感谢您的耐心与支持"
+            MessageReply.tem_reply_Text_Message(text, e_context)
+
+            SDReply.custom_Image(content, is_use_fanyi, bot_prompt, Model, request_bot_name, start_args, params,
+                                 session_id, negative_prompt, maxsize, e_context)
+        except Exception as e:
+            raise RuntimeError(f"图片处理发生错误: {e}") from e
+
+    @staticmethod
+    def process_image_change(Model, request_bot_name, start_args, default_options,
+                             roleRule_options, denoising_strength, cfg_scale,
+                             prompt, negative_prompt, title, maxsize: int, e_context):
+        try:
+            content = MessageHandle.init_content(e_context)
+
+            text = "🚀图片生成中～～～\n⏳请您耐心等待1-2分钟\n✨请稍等片刻✨✨\n❤️感谢您的耐心与支持"
+            MessageReply.tem_reply_Text_Message(text, e_context)
+
+            SDReply.change_Image(content, Model, request_bot_name, start_args, default_options,
+                                 roleRule_options, denoising_strength, cfg_scale,
+                                 prompt, negative_prompt, title, maxsize, e_context)
+        except Exception as e:
+            raise RuntimeError(f"图片处理发生错误: {e}") from e
+
+    @staticmethod
+    def process_image_transform(Model, request_bot_name, start_args, use_https, host, port, file_url,
+                                prompt, negative_prompt, maxsize: int, e_context):
+        try:
+            content = MessageHandle.init_content(e_context)
+
+            text = "🚀图片生成中～～～\n⏳请您耐心等待1-2分钟\n✨请稍等片刻✨✨\n❤️感谢您的耐心与支持"
+            MessageReply.tem_reply_Text_Message(text, e_context)
+
+            SDReply.transform_Image(content, Model, request_bot_name, start_args, use_https, host, port, file_url,
+                                    prompt, negative_prompt, maxsize, e_context)
+        except Exception as e:
+            raise RuntimeError(f"图片处理发生错误: {e}") from e
+
+    @staticmethod
+    def process_image_large(use_https, host, port, file_url, e_context):
+        content = MessageHandle.init_content(e_context)
+
+        text = "🚀图片生成中～～～\n⏳请您耐心等待1-2分钟\n✨请稍等片刻✨✨\n❤️感谢您的耐心与支持"
+        MessageReply.tem_reply_Text_Message(text, e_context)
+        try:
+            SDReply.large_Image(content, use_https, host, port, file_url, e_context)
+        except Exception as e:
+            raise RuntimeError(f"图片处理发生错误: {e}") from e
+
+    @staticmethod
+    def process_init_image(request_bot_name, role_options, e_context):
+        content = MessageHandle.init_content(e_context)
+        file_content = urllib.parse.quote(content)
+        if e_context['context'].type == ContextType.IMAGE:
+            replyText = message_type.in_image_reply(file_content, request_bot_name, role_options)
+            MessageReply.reply_Text_Message(True, replyText, e_context)
+
+    @staticmethod
+    def process_init_image_url(request_bot_name, role_options, e_context):
+        try:
+            content = MessageHandle.init_content(e_context)
+            response = requests.get(content)
+            file_content = str(int(time.time())) + ".jpg"
+            if response.status_code == 200:
+                with open(file_content, 'wb') as file:
+                    file.write(response.content)
+                    replyText = message_type.in_image_reply(file_content, request_bot_name, role_options)
+                    MessageReply.reply_Text_Message(True, replyText, e_context)
+            else:
+                logger.error("下载失败")
+                e_context.action = EventAction.BREAK_PASS
+        except Exception as e:
+            raise RuntimeError(f"图片处理发生错误: {e}") from e
+
+    @staticmethod
+    def process_baiDuAI_image(baidu_api_key, baidu_secret_key, e_context):
+        try:
+            content = MessageHandle.init_content(e_context)
+            file_content = content.split()[2]
+            logger.info(f"{file_content}")
+
+            if os.path.isfile(file_content):
+                encoded_image = Baidu_Image.read_and_encode_image(file_content)
+                if not encoded_image:
+                    return
+                MessageReply.tem_reply_Text_Message(
+                    "🚀图片生成中～～～\n⏳请您耐心等待1-2分钟\n✨请稍等片刻✨✨\n❤️感谢您的耐心与支持",
+                    e_context
+                )
+                access_token = Baidu_Image.get_access_token(baidu_api_key, baidu_secret_key)
+                if not access_token:
+                    MessageReply.reply_Error_Message(True, "无法获取百度AI接口访问令牌", e_context)
+                    return
+                processed_image_data = Baidu_Image.process_image(encoded_image, access_token)
+                if processed_image_data:
+                    Baidu_Image.reply_image(processed_image_data, file_content, e_context)
+                else:
+                    MessageReply.reply_Error_Message(True, "未找到转换后的图像数据", e_context)
+            else:
+                MessageReply.reply_Error_Message(True, "🥰请先发送图片给我,我将为您进行图像修复", e_context)
+        except Exception as e:
+            raise RuntimeError(f"图片处理发生错误: {e}") from e
