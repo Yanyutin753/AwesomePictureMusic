@@ -7,14 +7,12 @@ from common.log import logger
 
 
 # 读取配置文件
-@staticmethod
 def get_config_path(json_path: str):
     cursor = os.path.dirname(__file__)
     return os.path.join(cursor, json_path)
 
 
 # 读取配置文件
-@staticmethod
 def update_config(config_path, user_id, append):
     with open(config_path, "r", encoding="utf-8") as f:
         config = json.load(f)
@@ -27,7 +25,6 @@ def update_config(config_path, user_id, append):
 
 
 # 用于图片和文件转成base64
-@staticmethod
 def file_toBase64(image_path: str):
     if os.path.isfile(image_path):
         try:
@@ -46,3 +43,11 @@ def file_toBase64(image_path: str):
     else:
         logger.warning(f"文件不存在: {image_path}")
         return None
+
+
+def delete_file(file_content):
+    if os.path.isfile(file_content):
+        os.remove(file_content)
+        logger.info("文件已成功删除")
+    else:
+        logger.error("文件不存在")

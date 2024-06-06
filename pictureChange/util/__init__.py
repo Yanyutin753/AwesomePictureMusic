@@ -32,7 +32,7 @@ def text_to_image(url: str, key: str, prompt: str, model: str, session_id: str =
 
 
 # 文字生成音乐
-def text_to_music(url: str, key: str, prompt: str, model: str, max_retries: int = 1, backoff_factor: float = 1.0,
+def text_to_music(url: str, key: str, prompt: str, model: str, max_retries: int = 1,
                   session_id: str = None):
     headers = {
         'Authorization': f'Bearer {key}',
@@ -59,11 +59,8 @@ def text_to_music(url: str, key: str, prompt: str, model: str, max_retries: int 
             # bot.sessions.session_reply(reply, session_id)
             return reply
 
-        except requests.exceptions.RequestException as e:
-            if hasattr(response, 'status_code') and response.status_code == 503:
-                retries += 1
-            else:
-                return f"An error occurred: {e}"
+        except requests.exceptions.RequestException:
+            retries += 1
 
     return f"Failed to retrieve content after {max_retries} attempts due to 503 errors."
 

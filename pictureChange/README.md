@@ -28,6 +28,7 @@
 ![image](https://github.com/Yanyutin753/pictureChange/assets/132346501/5e310369-011d-430c-a85b-ca95946af799)
 
 ### 2.如果你的**chatgpt-on-wechat
+
 **是最新版，[请点击查看](https://github.com/Yanyutin753/pictureChange/issues/9#issuecomment-2024305057)
 
 ### 3.**确保图片位置填写正确**
@@ -294,8 +295,10 @@ PS: 如果你下载了多个模型，就可以根据实际需要，填入你想�
 ## 个人号
 
 1.
+
 直接把[godcmd.py](https://github.com/Yanyutin753/wechat_pictureChange/blob/main/%E5%85%AC%E4%BC%97%E5%8F%B7%E5%92%8C%E4%BC%81%E4%B8%9A%E5%BE%AE%E4%BF%A1/godcmd.py)
 覆盖你的chatgpt-on-wechat\plugins\godcmd\godcmd.py
+
 2. 在根目录config.json和config.py分别添加下面代码
 
 - config.json
@@ -315,6 +318,7 @@ PS: 如果你下载了多个模型，就可以根据实际需要，填入你想�
 ### 公众号和企业微信
 
 1.
+
 直接把[godcmd.py](https://github.com/Yanyutin753/wechat_pictureChange/blob/main/%E5%85%AC%E4%BC%97%E5%8F%B7%E5%92%8C%E4%BC%81%E4%B8%9A%E5%BE%AE%E4%BF%A1/godcmd.py)
 覆盖你的chatgpt-on-wechat\plugins\godcmd\godcmd.py
 

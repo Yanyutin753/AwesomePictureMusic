@@ -19,14 +19,12 @@ def on_image_reply(request_bot_name, image_type, all_seeds, modelname, minutes, 
     composition_2 = 0
     for seed in all_seeds:
         composition_1 += 1
-        replyText += "\n\n{} 🤖 放大 {}.png {}".format(request_bot_name,
-                                                      f"{image_type}/{seed}",
-                                                      composition_1)
+        replyText += ("\n\n{} 🤖 放大 {}.png {}"
+                      .format(request_bot_name, f"{image_type}/{seed}", composition_1))
     for seed in all_seeds:
         composition_2 += 1
-        replyText += "\n\n{} 🎡 变换 {}.png {} {}".format(request_bot_name,
-                                                         f"{image_type}/{seed}",
-                                                         modelname, composition_2)
+        replyText += ("\n\n{} 🎡 变换 {}.png {} {}"
+                      .format(request_bot_name, f"{image_type}/{seed}", modelname, composition_2))
     replyText += ("\n\n🥰 温馨提示\n✨ 1:左上 2:右上 3:左下 4:右下\n👑 MODEL_1 : 动漫\n🏆 MODEL_2 : 现实\n🧩 MODEL_3 : Q版\n🌈 "
                   f"图片不满意的话，点击变换\n{request_bot_name}帮你再画一幅吧!\n💖 感谢您的使用！")
 

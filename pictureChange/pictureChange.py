@@ -67,17 +67,20 @@ class pictureChange(Plugin):
                                         "gross proportions,missing arms,missing legs,extra digit, extra arms, "
                                         "extra leg, extra foot,teethcroppe,signature, watermark, username,blurry,"
                                         "cropped,jpeg artifacts,text,error,Lower body exposure")
+
                 self.bot_prompt = '''作为 Stable Diffusion Prompt 提示词专家，您将从关键词中创建提示，通常来自 Danbooru 
                 等数据库。提示通常描述图像，使用常见词汇，按重要性排列，并用逗号分隔。避免使用"-"或"."，但可以接受空格和自然语言。避免词汇重复。为了强调关键词，请将其放在括号中以增加其权重。例如，"( 
                 flowers)"将'flowers'的权重增加1.1倍，而"(((flowers)))"将其增加1.331倍。使用"( 
                 flowers:1.5)"将'flowers'的权重增加1.5倍。只为重要的标签增加权重。提示包括三个部分：前缀（质量标签+风格词+效果器）+ 主题（图像的主要焦点）+ 
                 场景（背景、环境）。前缀影响图像质量。像"masterpiece"、"best 
                 quality"、"4k"这样的标签可以提高图像的细节。像"illustration"、"lensflare"这样的风格词定义图像的风格。像"bestlighting"、"lensflare 
-                "、"depthoffield"这样的效果器会影响光照和深度。主题是图像的主要焦点，如角色或场景。对主题进行详细描述可以确保图像丰富而详细。增加主题的权重以增强其清晰度。对于角色，描述面部、头发、身体、服装、
-                姿势等特征。场景描述环境。没有场景，图像的背景是平淡的，主题显得过大。某些主题本身包含场景（例如建筑物、风景）。像"花草草地"、"阳光"、"河流"这样的环境词可以丰富场景。你的任务是设计图像生成的提示。
-                请按照以下步骤进行操作：我会发送给您一个图像场景。生成详细的图像描述，输出 Positive Prompt ,并确保用英文回复我。示例：我发送：二战时期的护士。 您回复：A WWII-era nurse in a German 
-                uniform, holding a wine bottle and stethoscope, sitting at a table in white attire, with a table in the background, masterpiece, best quality, 4k, 
-                illustration style, best lighting, depth of field, detailed character, detailed environment.'''
+                "、"depthoffield"这样的效果器会影响光照和深度。主题是图像的主要焦点，如角色或场景。对主题进行详细描述可以确保图像丰富而详细。增加主题的权重以增强
+                其清晰度。对于角色，描述面部、头发、身体、服装、姿势等特征。场景描述环境。没有场景，图像的背景是平淡的，主题显得过大。某些主题本身包含场景（例如建筑物
+                、风景）。像"花草草地"、"阳光"、"河流"这样的环境词可以丰富场景。你的任务是设计图像生成的提示。请按照以下步骤进行操作：我会发送给您一个图像场景。生成
+                详细的图像描述，输出 Positive Prompt ,并确保用英文回复我。示例：我发送：二战时期的护士。您回复：A WWII-era nurse in a German uniform, 
+                holding a wine bottle and stethoscope, sitting at a table in white attire,with a table in the background, masterpiece, 
+                best quality, 4k, illustration style, best lighting, depth of field, detailed character,detailed environment.'''
+
                 self.max_number = int(config["max_number"])
                 self.max_size = int(config["max_size"])
                 self.use_pictureChange = config["use_pictureChange"]
@@ -116,6 +119,8 @@ class pictureChange(Plugin):
                 replyText = "🥰图生图模式已开启，请发送图片给我,我将为您进行图像处理"
             else:
                 replyText = "🤖图生图模式已开启，请勿重复开启"
+            MessageReply.reply_Text_Message(True, replyText, e_context)
+
         elif content == "关闭图生图":
             if context["msg"].other_user_id in self.other_user_id:
                 self.other_user_id.remove(context["msg"].other_user_id)
@@ -124,14 +129,9 @@ class pictureChange(Plugin):
                 replyText = "🥰图生图模式已关闭"
             else:
                 replyText = "😭请检查图生图是否开启"
-
-        MessageReply.reply_Text_Message(True, replyText, e_context)
+            MessageReply.reply_Text_Message(True, replyText, e_context)
 
     def on_handle_context(self, e_context: EventContext):
-        message_limit = MessageLimit()
-        if message_limit.isLimit(self.max_number, e_context):
-            return
-
         if not self.use_pictureChange:
             replyText = f"😭图生图关闭了，快联系管理员开启图生图吧🥰🥰🥰"
             MessageReply.reply_Text_Message(False, replyText, e_context)
@@ -162,6 +162,7 @@ class pictureChange(Plugin):
         logger.debug(context)
         logger.debug(f"收到信息：{content}")
 
+        title = ""
         # 是否存在自定义规则
         for role in self.role_options:
             if content.startswith(role['title'] + " "):
@@ -175,6 +176,7 @@ class pictureChange(Plugin):
                         roleRule_options[key] = role["options"][key]
                 check_exist = True
                 break
+
         # 开启插件，否则不能正常使用（这里可以添加限制）
         if content in ["开启图生图", "关闭图生图"]:
             self.handle_image_mode(content, e_context)
@@ -192,7 +194,7 @@ class pictureChange(Plugin):
 
                 elif any(ext in content for ext in ["jpg", "jpeg", "png", "gif", "webp"]) and (
                         content.startswith("http://") or content.startswith("https://")):
-                    Common.process_init_image_url(self.request_bot_name, self.role_options, e_context)
+                    Common.process_init_image_url(request_bot_name, self.role_options, e_context)
 
                 elif e_context['context'].type == ContextType.IMAGE_CREATE:
                     Common.process_image_create(self.is_use_fanyi, self.bot_prompt, self.rules, self.Model,
@@ -208,26 +210,31 @@ class pictureChange(Plugin):
                     MessageReply.reply_Text_Message(True, replyText, e_context)
 
                 elif content.startswith("🤖 图像修复 "):
-                    Common.process_baiDuAI_image(self.baidu_api_key, self.baidu_secret_key, e_context)
+                    Common.process_baidu_image(self.baidu_api_key, self.baidu_secret_key, e_context)
 
                 elif content.startswith("🖼️ 图像描述 "):
                     Common.process_image(self.openai_api_base, self.openai_api_key, self.image_recognize_model,
                                          self.image_recognize_prompt, e_context)
 
                 elif content.startswith("🎡 自定义 "):
+                    message_limit = MessageLimit()
+                    if message_limit.isLimit(self.max_number, e_context):
+                        return
                     message_limit.using()
                     Common.process_image_custom(self.is_use_fanyi, self.bot_prompt, self.Model, request_bot_name,
-                                                self.start_args, self.default_params,
-                                                negative_prompt, self.max_size, e_context)
-                    message_limit.success()
+                                                self.start_args, negative_prompt, self.max_size, e_context)
+                    message_limit.success(self.max_number)
 
                 # 判断用户发送的消息是否在config.json预设里面
                 elif check_exist:
+                    message_limit = MessageLimit()
+                    if message_limit.isLimit(self.max_number, e_context):
+                        return
                     message_limit.using()
                     Common.process_image_change(self.Model, request_bot_name, self.start_args, self.default_options,
                                                 roleRule_options, denoising_strength, cfg_scale, prompt,
                                                 negative_prompt, title, self.max_size, e_context)
-                    message_limit.success()
+                    message_limit.success(self.max_number)
 
                 elif content.startswith("🎡 变换 "):
                     Common.process_image_transform(self.Model, request_bot_name, self.start_args, self.use_https,

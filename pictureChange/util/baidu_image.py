@@ -1,14 +1,13 @@
 import base64
 import io
-import os
-import urllib
+import urllib.parse
 
 import requests
 from oauthlib.common import urlencoded
 
 from common.log import logger
 from plugins.pictureChange.message import message_reply as MessageReply
-from plugins.pictureChange.util import file_handle
+from plugins.pictureChange.util import file_handle as FileHandle
 
 
 # 百度图片处理
@@ -33,7 +32,7 @@ def reply_image(base64_image_data, file_content, e_context):
         image_storage.write(image_data)
         image_storage.seek(0)
         MessageReply.reply_Image_Message(True, image_storage, e_context)
-        file_handle.delete_file(file_content)
+        FileHandle.delete_file(file_content)
     except Exception as e:
         logger.error(f"回复图片时出现错误：{e}")
 
@@ -72,11 +71,3 @@ def process_image(encoded_image, access_token):
     except requests.RequestException as e:
         logger.error(f"API请求失败：{e}")
         return None
-
-
-def delete_file(file_content):
-    if os.path.isfile(file_content):
-        os.remove(file_content)
-        logger.info("文件已成功删除")
-    else:
-        logger.error("文件不存在")

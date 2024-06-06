@@ -1,22 +1,22 @@
 import os
-import urllib
-from datetime import time
+import time
+import urllib.parse
 
 import requests
 
-import plugins.pictureChange.message.message_handle as Baidu_Image
 import plugins.pictureChange.message.message_sd_reply as SDReply
 import plugins.pictureChange.util.baidu_image as Baidu_Image
 from bridge.context import ContextType
 from common.log import logger
 from plugins import EventAction
 from plugins.pictureChange import util
+from plugins.pictureChange.message import message_handle as MessageHandle
 from plugins.pictureChange.message import message_reply as MessageReply
-from plugins.pictureChange.message import message_type
-from plugins.pictureChange.message import message_type as MessageHandle
-from plugins.pictureChange.util import file_handle
+from plugins.pictureChange.message import message_type as MessageType
+from plugins.pictureChange.util import file_handle as FileHandle
 
 
+# 描述图片信息
 def process_image_content(openai_api_base, openai_api_key, image_recognize_model, prompt, recognize_func,
                           error_message, reply_message_method, e_context):
     context = e_context['context']
@@ -24,7 +24,7 @@ def process_image_content(openai_api_base, openai_api_key, image_recognize_model
     file_content = context.content.strip().split()[2]
     if os.path.isfile(file_content):
         try:
-            file_url = file_handle.file_toBase64(file_content)
+            file_url = FileHandle.file_toBase64(file_content)
             logger.info(file_url)
             replyText = recognize_func(openai_api_base + "/chat/completions",
                                        openai_api_key, prompt, file_url,
@@ -32,13 +32,12 @@ def process_image_content(openai_api_base, openai_api_key, image_recognize_model
         except Exception as e:
             replyText = error_message
             logger.error("Processing failed: {}".format(str(e)))
-        finally:
-            reply_message_method(True, replyText, e_context)
     else:
         replyText = error_message
-        reply_message_method(True, replyText, e_context)
+    reply_message_method(True, replyText, e_context)
 
 
+# 描述文件信息
 def process_file_content(openai_api_base, openai_api_key, file_recognize_model, prompt, recognize_func,
                          error_message,
                          reply_message_method,
@@ -48,7 +47,7 @@ def process_file_content(openai_api_base, openai_api_key, file_recognize_model, 
     file_content = context.content.strip()
     if os.path.isfile(file_content):
         try:
-            file_url = file_handle.file_toBase64(file_content)
+            file_url = FileHandle.file_toBase64(file_content)
             logger.info(file_url)
             replyText = recognize_func(openai_api_base + "/chat/completions",
                                        openai_api_key, prompt, file_url,
@@ -56,11 +55,9 @@ def process_file_content(openai_api_base, openai_api_key, file_recognize_model, 
         except Exception as e:
             replyText = error_message
             logger.error("Processing failed: {}".format(str(e)))
-        finally:
-            reply_message_method(True, replyText, e_context)
     else:
         replyText = error_message
-        reply_message_method(True, replyText, e_context)
+    reply_message_method(True, replyText, e_context)
 
 
 class Common:
@@ -79,6 +76,7 @@ class Common:
                              "🥰请先发送文件给我,我将为您进行文件分析",
                              MessageReply.reply_Text_Message, e_context)
 
+    # 图片创作
     @staticmethod
     def process_image_create(is_use_fanyi, bot_prompt, rules, Model, request_bot_name, start_args, params, options,
                              e_context):
@@ -95,8 +93,9 @@ class Common:
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
+    # 图片自定义图生图
     @staticmethod
-    def process_image_custom(is_use_fanyi, bot_prompt, Model, request_bot_name, start_args, params,
+    def process_image_custom(is_use_fanyi, bot_prompt, Model, request_bot_name, start_args,
                              negative_prompt, maxsize: int, e_context):
         try:
             context = e_context['context']
@@ -106,11 +105,12 @@ class Common:
             text = "🚀图片生成中～～～\n⏳请您耐心等待1-2分钟\n✨请稍等片刻✨✨\n❤️感谢您的耐心与支持"
             MessageReply.tem_reply_Text_Message(text, e_context)
 
-            SDReply.custom_Image(content, is_use_fanyi, bot_prompt, Model, request_bot_name, start_args, params,
+            SDReply.custom_Image(content, is_use_fanyi, bot_prompt, Model, request_bot_name, start_args,
                                  session_id, negative_prompt, maxsize, e_context)
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
+    # 图片按照config配置图生图
     @staticmethod
     def process_image_change(Model, request_bot_name, start_args, default_options,
                              roleRule_options, denoising_strength, cfg_scale,
@@ -127,6 +127,7 @@ class Common:
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
+    # 图片变换
     @staticmethod
     def process_image_transform(Model, request_bot_name, start_args, use_https, host, port, file_url,
                                 prompt, negative_prompt, maxsize: int, e_context):
@@ -141,6 +142,7 @@ class Common:
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
+    # 图片放大
     @staticmethod
     def process_image_large(use_https, host, port, file_url, e_context):
         content = MessageHandle.init_content(e_context)
@@ -152,14 +154,16 @@ class Common:
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
+    # 接收图片初始化发送信息
     @staticmethod
     def process_init_image(request_bot_name, role_options, e_context):
         content = MessageHandle.init_content(e_context)
         file_content = urllib.parse.quote(content)
         if e_context['context'].type == ContextType.IMAGE:
-            replyText = message_type.in_image_reply(file_content, request_bot_name, role_options)
+            replyText = MessageType.in_image_reply(file_content, request_bot_name, role_options)
             MessageReply.reply_Text_Message(True, replyText, e_context)
 
+    # 接收图片链接初始化发送信息
     @staticmethod
     def process_init_image_url(request_bot_name, role_options, e_context):
         try:
@@ -169,7 +173,7 @@ class Common:
             if response.status_code == 200:
                 with open(file_content, 'wb') as file:
                     file.write(response.content)
-                    replyText = message_type.in_image_reply(file_content, request_bot_name, role_options)
+                    replyText = MessageType.in_image_reply(file_content, request_bot_name, role_options)
                     MessageReply.reply_Text_Message(True, replyText, e_context)
             else:
                 logger.error("下载失败")
@@ -177,8 +181,9 @@ class Common:
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
+    # 处理百度图片(图像修复)
     @staticmethod
-    def process_baiDuAI_image(baidu_api_key, baidu_secret_key, e_context):
+    def process_baidu_image(baidu_api_key, baidu_secret_key, e_context):
         try:
             content = MessageHandle.init_content(e_context)
             file_content = content.split()[2]

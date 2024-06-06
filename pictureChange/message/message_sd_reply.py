@@ -104,7 +104,7 @@ def create_Image(content, is_use_fanyi, bot_prompt, rules, Model,
 
 
 # 用于stable_diffusion自定义图生图
-def custom_Image(content, is_use_fanyi, bot_prompt, Model, request_bot_name, start_args, params, session_id,
+def custom_Image(content, is_use_fanyi, bot_prompt, Model, request_bot_name, start_args, session_id,
                  maxsize: int, negative_prompt, e_context):
     start_time = time.time()
     start_index = content.find("tmp/")
@@ -115,7 +115,7 @@ def custom_Image(content, is_use_fanyi, bot_prompt, Model, request_bot_name, sta
     keywords_string = ' '.join(keywords)
     prompt = keywords_string
     images = []
-    prompt = translate_prompt.simple_translatePrompt(is_use_fanyi, bot_prompt, prompt, params, session_id)
+    prompt = translate_prompt.simple_translatePrompt(is_use_fanyi, bot_prompt, prompt, session_id)
 
     if os.path.isfile(file_content):
         try:
