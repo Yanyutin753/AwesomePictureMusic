@@ -1,4 +1,6 @@
 {
+  "password": "",
+
   "use_pictureChange": true,
   "max_number": 3,
   "is_use_fanyi": false,
