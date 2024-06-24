@@ -12,8 +12,6 @@
     "image_recognize_prompt": "请帮我描述这个图片的内容。【重要】1.请不要用markdown语法输出 2.请仔细阅读之后把你描述的内容分析给我！",
     "file_recognize_prompt": "请帮我描述这个文件的内容，【重要】1.请不要用markdown语法输出 2.请仔细阅读之后把你描述的内容分析给我！",
     "use_group": [
-        "@@8ca654d55cc0acf925b91366fa1e1411f0e494485f970d6f9eb991baf400f5fd",
-        "@@30fef12cd34692c486bd93901df71d69382aef2331f9e56ecc05155810e1f84e"
     ],
     "max_size": 1024,
     "start": {
