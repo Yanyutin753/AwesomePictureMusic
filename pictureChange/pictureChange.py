@@ -48,6 +48,9 @@ class pictureChange(Plugin):
                 self.baidu_api_key = config["baidu_api_key"]
                 self.baidu_secret_key = config["baidu_secret_key"]
 
+                # 用于音乐分析
+                self.music_model = config["music_model"]
+
                 # 用于图片和文件分析
                 self.openai_api_key = config["openai_api_key"]
                 self.openai_api_base = config["openai_api_base"]
@@ -243,6 +246,12 @@ class pictureChange(Plugin):
 
                 elif content.startswith("🤖 放大 "):
                     Common.process_image_large(self.use_https, self.host, self.port, self.file_url, e_context)
+
+                elif content.startswith("文生音 "):
+                    prompt = content.replace("文生音 ", "")
+                    logger.info(content)
+                    Common.process_text_music(self.openai_api_base, self.openai_api_key, self.music_model,
+                                              prompt, e_context)
 
                 # 跳过插件，到下一个插件里面
                 else:

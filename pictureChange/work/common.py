@@ -13,6 +13,7 @@ from plugins.pictureChange import util
 from plugins.pictureChange.message import message_handle as MessageHandle
 from plugins.pictureChange.message import message_reply as MessageReply
 from plugins.pictureChange.message import message_type as MessageType
+from plugins.pictureChange.message.music_handle import music_handle
 from plugins.pictureChange.util import file_handle as FileHandle
 
 
@@ -186,7 +187,7 @@ class Common:
     def process_baidu_image(baidu_api_key, baidu_secret_key, e_context):
         try:
             content = MessageHandle.init_content(e_context)
-            file_content = content.split()[2]
+            file_content = content.split()[1]
             logger.info(f"{file_content}")
 
             if os.path.isfile(file_content):
@@ -210,3 +211,12 @@ class Common:
                 MessageReply.reply_Error_Message(True, "🥰请先发送图片给我,我将为您进行图像修复", e_context)
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
+
+    @staticmethod
+    def process_text_music(url, key, model, prompt, e_context):
+        try:
+            url = url + "/chat/completions"
+            logger.info(f"prompt: {prompt}")
+            music_handle.text_to_music(url, key, prompt, model, e_context)
+        except Exception as e:
+            raise RuntimeError(f"文生音乐发生错误: {e}") from e
