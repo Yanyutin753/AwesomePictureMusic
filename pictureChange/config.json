@@ -13,10 +13,7 @@
     "file_recognize_prompt": "请帮我描述这个文件的内容，【重要】1.请不要用markdown语法输出 2.请仔细阅读之后把你描述的内容分析给我！",
     "use_group": [
         "@@8ca654d55cc0acf925b91366fa1e1411f0e494485f970d6f9eb991baf400f5fd",
-        "@@30fef12cd34692c486bd93901df71d69382aef2331f9e56ecc05155810e1f84e",
-        "@@4937248b05c8d5ae100d9bd758fc77a0a172ce6a2a0cd9f6e25002e69a7ee2e7",
-        "@@7d6dc439cb3ddd04d4e1dff0d82caa3766e6e43591ce719c2bc12a6d74288c9e",
-        "@@2486b6a0c91e6d8b4068fed7f13b5808f22d1c3e3c1fbdc235524d87d0def4e0"
+        "@@30fef12cd34692c486bd93901df71d69382aef2331f9e56ecc05155810e1f84e"
     ],
     "max_size": 1024,
     "start": {
