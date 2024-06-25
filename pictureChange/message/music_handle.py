@@ -125,7 +125,6 @@ class music_handle:
                                         print(result["video2"])
                                         message_reply.reply_VideoUrl_Message(result["video1"])
 
-                                    if result[]
                                     # if message_content:
                                     #     content += message_content
                             except json.JSONDecodeError:

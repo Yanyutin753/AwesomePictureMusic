@@ -5,7 +5,7 @@ from plugins import *
 from plugins.pictureChange.message import message_reply as MessageReply, message_type
 from plugins.pictureChange.message.message_limit import MessageLimit
 from plugins.pictureChange.work.common import Common
-
+from .adminService.adminService import adminService
 
 @plugins.register(name="pictureChange", desc="利用百度云AI和stable-diffusion webui来画图,图生图", version="1.8.5",
                   author="yang yang")
@@ -87,6 +87,8 @@ class pictureChange(Plugin):
                 self.max_number = int(config["max_number"])
                 self.max_size = int(config["max_size"])
                 self.use_pictureChange = config["use_pictureChange"]
+                # 管理员操作
+                self.admin = adminService()
             self.handlers[Event.ON_HANDLE_CONTEXT] = self.on_handle_context
             logger.info("[pictureChange] inited")
         except Exception as e:
@@ -103,6 +105,7 @@ class pictureChange(Plugin):
 
     @staticmethod
     def update_config(config_path, user_id, append):
+        
         with open(config_path, "r", encoding="utf-8") as f:
             config = json.load(f)
         if append:
@@ -140,6 +143,7 @@ class pictureChange(Plugin):
             MessageReply.reply_Text_Message(False, replyText, e_context)
             return
 
+
         channel = e_context['channel']
         if ReplyType.IMAGE in channel.NOT_SUPPORT_REPLYTYPE:
             return
@@ -148,6 +152,61 @@ class pictureChange(Plugin):
         context = e_context['context']
         context.get("msg").prepare()
         content = context.content.strip()
+
+        print(context)
+        sender_id = e_context.econtext["context"]["receiver"]
+
+        # 认证管理员
+        if content.startswith("认证"):
+            # 假设认证管理员的信息应该是:"认证 root"
+            # 分离参数
+            content1 = content.split(" ")
+            if content1 is None or len(content1) != 2:
+                return
+            if self.admin.verify_admin(sender_id, content1[1]):
+                replyText = "🥰认证成功"
+            else:
+                replyText = "😭认证失败,请重新认证"
+            MessageReply.reply_Text_Message(True, replyText, e_context)
+            return
+
+        if content.startswith("修改port"):
+            content1 = content.split(" ")
+            if len(content1) != 2:
+                return
+            self.admin.change_host(sender_id, content1[1])
+            self.port = content1[1]
+            replyText = f"🥰修改port成功，当前port为{self.port}"
+            MessageReply.reply_Text_Message(True, replyText, e_context)
+            return
+
+
+        if content.startswith("修改密码"):
+            content1 = content.split(" ")
+            if content1 is None or len(content1) != 2:
+                return
+            self.admin.update_password(sender_id, content1[1])
+            replyText = f"🥰修改密码成功"
+            MessageReply.reply_Text_Message(True, replyText, e_context)
+
+            return
+
+        if content.startswith("修改host"):
+            content1 = content.split(" ")
+            if len(content1) != 2:
+                return
+            self.admin.change_host(sender_id, content1[1])
+            self.host = content1[1]
+            replyText = f"🥰修改host成功，当前host为{self.host}"
+            MessageReply.reply_Text_Message(True, replyText, e_context)
+            return
+
+        # 清空管理员
+        if content.startswith("清空管理员"):
+            self.admin.clear_admin(sender_id)
+            replyText = "🥰清空管理员成功"
+            MessageReply.reply_Text_Message(True, replyText, e_context)
+            return
 
         # 初始化画图参数
         check_exist = False
@@ -182,6 +241,11 @@ class pictureChange(Plugin):
 
         # 开启插件，否则不能正常使用（这里可以添加限制）
         if content in ["开启图生图", "关闭图生图"]:
+            if self.admin.is_admin(e_context.econtext["context"]["receiver"]) == False:
+                replyText = "😭您没有权限开启或关闭图生图"
+                MessageReply.reply_Text_Message(True, replyText, e_context)
+                return
+
             self.handle_image_mode(content, e_context)
 
         # 判断成员已经开启插件，没有开启直接跳过
