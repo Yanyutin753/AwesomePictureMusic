@@ -2,8 +2,6 @@ import json
 import os
 import random
 import string
-import logging
-from typing import Tuple
 
 class adminService():
     def __init__(self):
