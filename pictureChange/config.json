@@ -1,5 +1,5 @@
 {
-    "use_pictureChange": true,
+    "use_pictureChange": "True",
     "max_number": 3,
     "is_use_fanyi": false,
     "file_url": "file=D:/sd/sd-webui-aki/sd-webui-aki-v4.2/sd-webui-aki-v4.2/outputs/",
@@ -15,13 +15,13 @@
     "use_group": [],
     "max_size": 1024,
     "start": {
-        "host": "11",
-        "port": 80,
+        "host": "1234",
+        "port": "0000",
         "use_https": false
     },
     "defaults": {
         "params": {
-            "sampler_name": "Euler a",
+            "sampler_name": "Euler r",
             "steps": 20,
             "width": 512,
             "height": 512,

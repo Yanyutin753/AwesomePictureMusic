@@ -55,34 +55,6 @@ class adminService():
         print(f"[adminService] 修改管理员密码成功! admin_password: {self.admin_password}")
         return True
 
-    # 修改插件中的host
-    def change_host(self, user_id: str, host: str) -> bool:
-        if self.is_admin(user_id) == False:
-            return False
-        # 保存配置文件, 修改配置文件为新host
-        # 将修改后的host写入文件,插件应该在上一文件夹,其他之不需要修改
-        config_path = os.path.join(os.path.dirname(__file__), "../config.json")
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-            config["start"]["host"] = host
-        with open(config_path, "w", encoding="utf-8") as f:
-            json.dump(config, f, ensure_ascii=False, indent=4)
-        print(f"[adminService] 修改host成功! host: {host}")
-        return True
-
-    # 修改插件中的port
-    def change_port(self, user_id: str, port: int) -> bool:
-        if self.is_admin(user_id) == False:
-            return False
-        config_path = os.path.join(os.path.dirname(__file__), "../config.json")
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-            config["start"]["port"] = port
-        with open(config_path, "w", encoding="utf-8") as f:
-            json.dump(config, f, ensure_ascii=False, indent=4)
-        print(f"[adminService] 修改port成功! port: {port}")
-        return True
-
     # 清空现有的管理员名单
     def clear_admin(self, user_id: str) -> bool:
         if self.is_admin(user_id) == False:
@@ -96,3 +68,67 @@ class adminService():
             json.dump(config, f, ensure_ascii=False, indent=4)
         print(f"[adminService] 清空管理员成功!")
         return True
+
+    # 修改插件目录下的json文件，不定参数代表传递几层，如config["start"]["host"]
+    def update_json(self, user_id: str, target: str, *args, value: str) -> bool:
+        if not self.is_admin(user_id):
+            return False
+        
+        # 设定文件路径
+        config_path = os.path.join(os.path.dirname(__file__), "../config.json")
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+                
+            # 使用递归函数设置值
+            def set_nested_value(d, keys, value):
+                if len(keys) == 1:
+                    d[keys[0]] = value
+                else:
+                    if keys[0] not in d:
+                        d[keys[0]] = {}
+                    set_nested_value(d[keys[0]], keys[1:], value)
+            
+            # 调用递归函数
+            set_nested_value(config, [target] + list(args), value)
+            
+            with open(config_path, "w", encoding="utf-8") as f:
+                json.dump(config, f, ensure_ascii=False, indent=4)
+                
+            print(f"[adminService] 修改json成功! target: {target}, value: {value}")
+            return True
+        except Exception as e:
+            print(f"[adminService] 修改json失败! target: {target}, value: {value}, error: {str(e)}")
+            return False
+
+    # 添加元素
+    def append_json(self, user_id: str, target: str, *args, value: str) -> bool:
+        if not self.is_admin(user_id):
+            return False
+        
+        # 设定文件路径
+        config_path = os.path.join(os.path.dirname(__file__), "../config.json")
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+                
+            # 使用递归函数设置值
+            def set_nested_value(d, keys, value):
+                if len(keys) == 1:
+                    d[keys[0]].append(value)
+                else:
+                    if keys[0] not in d:
+                        d[keys[0]] = []
+                    set_nested_value(d[keys[0]], keys[1:], value)
+            
+            # 调用递归函数
+            set_nested_value(config, [target] + list(args), value)
+            
+            with open(config_path, "w", encoding="utf-8") as f:
+                json.dump(config, f, ensure_ascii=False, indent=4)
+                
+            print(f"[adminService] 修改json成功! target: {target}, value: {value}")
+            return True
+        except Exception as e:
+            print(f"[adminService] 修改json失败! target: {target}, value: {value}, error: {str(e)}")
+            return False

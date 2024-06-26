@@ -174,7 +174,7 @@ class pictureChange(Plugin):
             content1 = content.split(" ")
             if len(content1) != 2:
                 return
-            self.admin.change_host(sender_id, content1[1])
+            self.admin.update_json(sender_id, "start", "port", value=content1[1])
             self.port = content1[1]
             replyText = f"🥰修改port成功，当前port为{self.port}"
             MessageReply.reply_Text_Message(True, replyText, e_context)
@@ -195,7 +195,7 @@ class pictureChange(Plugin):
             content1 = content.split(" ")
             if len(content1) != 2:
                 return
-            self.admin.change_host(sender_id, content1[1])
+            self.admin.update_json(sender_id, "start", "host", value=content1[1])
             self.host = content1[1]
             replyText = f"🥰修改host成功，当前host为{self.host}"
             MessageReply.reply_Text_Message(True, replyText, e_context)
