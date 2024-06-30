@@ -1,0 +1,44 @@
+{
+    "AllFunction": {
+        "IS_IMAGE": "True",
+        "IS_FILE": "True",
+        "IS_MUSIC": "True",
+        "MODEL": [
+            "gpt-4o",
+            "glm-4",
+            "abab6.5-chat"
+        ]
+    },
+    "group": [
+        {
+            "name": "心鸣辩论群",
+            "function": {
+                "IMAGE": "True",
+                "FILE": "True",
+                "MUSIC": "False",
+                "MODEL": "gpt-4o",
+                "发送消息": "False"
+            }
+        },
+        {
+            "name": "505_failed",
+            "function": {
+                "IMAGE": "False",
+                "FILE": "False",
+                "MUSIC": "False",
+                "MODEL": "GLM-4",
+                "发送消息": "False"
+            }
+        },
+        {
+            "name": "500 Not Found",
+            "function": {
+                "IMAGE": "True",
+                "FILE": "True",
+                "MUSIC": "True",
+                "MODEL": "abab6.5-chat",
+                "发送消息": "True"
+            }
+        }
+    ]
+}

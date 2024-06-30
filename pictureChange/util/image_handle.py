@@ -12,7 +12,7 @@ def adjust_image(width, height, maxsize: int):
         width = int(width * scale_factor)
         height = int(height * scale_factor)
 
-    return width, height
+    return int(width), int(height)
 
 
 # 用于格式化图片 URL 的工具函数

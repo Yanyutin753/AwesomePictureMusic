@@ -17,6 +17,29 @@ from plugins.pictureChange.message.music_handle import music_handle
 from plugins.pictureChange.util import file_handle as FileHandle
 
 
+def process_image_music_content(openai_api_base, openai_api_key, image_recognize_model, prompt, recognize_func,
+                                reply_message_method, e_context):
+    context = e_context['context']
+    session_id = context.kwargs.get('session_id')
+    file_content = context.content.strip().split()[2]
+    if os.path.isfile(file_content):
+        try:
+            file_url = FileHandle.file_toBase64(file_content)
+            reply_text = recognize_func(openai_api_base,
+                                        openai_api_key, prompt, file_url,
+                                        image_recognize_model, session_id)
+            return reply_text
+        except Exception as e:
+            reply_text = str(e)
+            logger.error("Processing failed: {}".format(str(e)))
+            reply_message_method(True, reply_text, e_context)
+            return None
+    else:
+        reply_text = "找不到相应的图片文件，请联系管理员！"
+        reply_message_method(True, reply_text, e_context)
+        return None
+
+
 # 描述图片信息
 def process_image_content(openai_api_base, openai_api_key, image_recognize_model, prompt, recognize_func,
                           error_message, reply_message_method, e_context):
@@ -26,7 +49,6 @@ def process_image_content(openai_api_base, openai_api_key, image_recognize_model
     if os.path.isfile(file_content):
         try:
             file_url = FileHandle.file_toBase64(file_content)
-            logger.info(file_url)
             replyText = recognize_func(openai_api_base + "/chat/completions",
                                        openai_api_key, prompt, file_url,
                                        image_recognize_model, session_id)
@@ -49,7 +71,6 @@ def process_file_content(openai_api_base, openai_api_key, file_recognize_model, 
     if os.path.isfile(file_content):
         try:
             file_url = FileHandle.file_toBase64(file_content)
-            logger.info(file_url)
             replyText = recognize_func(openai_api_base + "/chat/completions",
                                        openai_api_key, prompt, file_url,
                                        file_recognize_model, session_id)
@@ -80,7 +101,7 @@ class Common:
     # 图片创作
     @staticmethod
     def process_image_create(is_use_fanyi, bot_prompt, rules, Model, request_bot_name, start_args, params, options,
-                             e_context):
+                             is_wecom, e_context):
         try:
             context = e_context['context']
             content = MessageHandle.init_content(e_context)
@@ -90,14 +111,14 @@ class Common:
             MessageReply.tem_reply_Text_Message(text, e_context)
 
             SDReply.create_Image(content, is_use_fanyi, bot_prompt, rules, Model, request_bot_name, start_args, params,
-                                 options, session_id, e_context)
+                                 options, session_id, is_wecom, e_context)
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
     # 图片自定义图生图
     @staticmethod
     def process_image_custom(is_use_fanyi, bot_prompt, Model, request_bot_name, start_args,
-                             negative_prompt, maxsize: int, e_context):
+                             negative_prompt, maxsize, is_wecom, e_context):
         try:
             context = e_context['context']
             content = MessageHandle.init_content(e_context)
@@ -107,7 +128,7 @@ class Common:
             MessageReply.tem_reply_Text_Message(text, e_context)
 
             SDReply.custom_Image(content, is_use_fanyi, bot_prompt, Model, request_bot_name, start_args,
-                                 session_id, negative_prompt, maxsize, e_context)
+                                 session_id, negative_prompt, maxsize, is_wecom, e_context)
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
@@ -115,7 +136,7 @@ class Common:
     @staticmethod
     def process_image_change(Model, request_bot_name, start_args, default_options,
                              roleRule_options, denoising_strength, cfg_scale,
-                             prompt, negative_prompt, title, maxsize: int, e_context):
+                             prompt, negative_prompt, title, maxsize: int, is_wecom, e_context):
         try:
             content = MessageHandle.init_content(e_context)
 
@@ -124,14 +145,14 @@ class Common:
 
             SDReply.change_Image(content, Model, request_bot_name, start_args, default_options,
                                  roleRule_options, denoising_strength, cfg_scale,
-                                 prompt, negative_prompt, title, maxsize, e_context)
+                                 prompt, negative_prompt, title, maxsize, is_wecom, e_context)
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
     # 图片变换
     @staticmethod
     def process_image_transform(Model, request_bot_name, start_args, use_https, host, port, file_url,
-                                prompt, negative_prompt, maxsize: int, e_context):
+                                prompt, negative_prompt, maxsize: int, is_wecom, e_context):
         try:
             content = MessageHandle.init_content(e_context)
 
@@ -139,7 +160,7 @@ class Common:
             MessageReply.tem_reply_Text_Message(text, e_context)
 
             SDReply.transform_Image(content, Model, request_bot_name, start_args, use_https, host, port, file_url,
-                                    prompt, negative_prompt, maxsize, e_context)
+                                    prompt, negative_prompt, maxsize, is_wecom, e_context)
         except Exception as e:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
@@ -157,16 +178,19 @@ class Common:
 
     # 接收图片初始化发送信息
     @staticmethod
-    def process_init_image(request_bot_name, role_options, e_context):
+    def process_init_image(request_bot_name, role_options, use_stable_diffusion,
+                           use_music_handle, use_file_handle, is_wecom, e_context):
         content = MessageHandle.init_content(e_context)
         file_content = urllib.parse.quote(content)
         if e_context['context'].type == ContextType.IMAGE:
-            replyText = MessageType.in_image_reply(file_content, request_bot_name, role_options)
+            replyText = MessageType.in_image_reply(file_content, request_bot_name, role_options, use_stable_diffusion,
+                                                   use_music_handle, use_file_handle, is_wecom)
             MessageReply.reply_Text_Message(True, replyText, e_context)
 
     # 接收图片链接初始化发送信息
     @staticmethod
-    def process_init_image_url(request_bot_name, role_options, e_context):
+    def process_init_image_url(request_bot_name, role_options, use_stable_diffusion,
+                               use_music_handle, use_file_handle, is_wecom, e_context):
         try:
             content = MessageHandle.init_content(e_context)
             response = requests.get(content)
@@ -174,7 +198,8 @@ class Common:
             if response.status_code == 200:
                 with open(file_content, 'wb') as file:
                     file.write(response.content)
-                    replyText = MessageType.in_image_reply(file_content, request_bot_name, role_options)
+                    replyText = MessageType.in_image_reply(file_content, request_bot_name, role_options,
+                                                           use_stable_diffusion, use_file_handle, use_music_handle, is_wecom)
                     MessageReply.reply_Text_Message(True, replyText, e_context)
             else:
                 logger.error("下载失败")
@@ -187,8 +212,7 @@ class Common:
     def process_baidu_image(baidu_api_key, baidu_secret_key, e_context):
         try:
             content = MessageHandle.init_content(e_context)
-            file_content = content.split()[1]
-            logger.info(f"{file_content}")
+            file_content = content.split()[2]
 
             if os.path.isfile(file_content):
                 encoded_image = Baidu_Image.read_and_encode_image(file_content)
@@ -213,10 +237,19 @@ class Common:
             raise RuntimeError(f"图片处理发生错误: {e}") from e
 
     @staticmethod
-    def process_text_music(url, key, model, prompt, e_context):
+    def process_text_music(bot_prompt, url, key, model, prompt, is_wecom, e_context):
         try:
             url = url + "/chat/completions"
-            logger.info(f"prompt: {prompt}")
-            music_handle.text_to_music(url, key, prompt, model, e_context)
+            music_handle.text_to_music(bot_prompt, True, url, key, prompt, model, is_wecom, e_context)
         except Exception as e:
             raise RuntimeError(f"文生音乐发生错误: {e}") from e
+
+    @staticmethod
+    def process_image_music(url, key, image_recognize_model, suno_model, bot_prompt, is_wecom, e_context):
+        try:
+            url = url + "/chat/completions"
+            image_text = process_image_music_content(url, key, image_recognize_model, bot_prompt, util.recognize_image,
+                                                     MessageReply.reply_Text_Message, e_context)
+            music_handle.text_to_music(bot_prompt, False, url, key, image_text, suno_model, is_wecom, e_context)
+        except Exception as e:
+            raise RuntimeError(f"图生音乐发生错误: {e}") from e

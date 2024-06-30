@@ -29,7 +29,7 @@ def reply_Error_Message(is_break, reply_content, e_context):
 
 # 根据reply_content(image_url)获取图片,发送图片消息
 # 根据is_break决定是否结束会话
-def reply_ImageUrl_Message(is_break, reply_content, e_context):
+def reply_Image_Url_Message(is_break, reply_content, e_context):
     reply_message(is_break, ReplyType.IMAGE_URL, reply_content, e_context)
 
 
@@ -47,7 +47,7 @@ def reply_Video_Message(is_break, reply_content, e_context):
 
 # 根据reply_content(video_url)获取音频,发送音频消息
 # 根据is_break决定是否结束会话
-def reply_VideoUrl_Message(is_break, reply_content, e_context):
+def reply_Video_Url_Message(is_break, reply_content, e_context):
     reply_message(is_break, ReplyType.VIDEO_URL, reply_content, e_context)
 
 
@@ -60,4 +60,25 @@ def tem_reply_Text_Message(reply_content, e_context):
 # 立即发送图片消息(reply_content)，不结束会话
 def tem_reply_Image_Message(reply_content, e_context):
     reply = Reply(ReplyType.IMAGE, reply_content)
+    e_context['channel'].send(reply, e_context["context"])
+
+
+# 立即发送图片消息(reply_content)，不结束会话
+def tem_reply_Image_Url_Message(reply_content, e_context):
+    reply = Reply(ReplyType.IMAGE_URL, reply_content)
+    e_context['channel'].send(reply, e_context["context"])
+
+
+# 立即发送音频消息(reply_content)，不结束会话
+def tem_reply_Video_Message(reply_content, e_context):
+    try:
+        reply = Reply(ReplyType.FILE, reply_content)
+        e_context['channel'].send(reply, e_context["context"])
+    except Exception as e:
+        logger.error(f"Error sending video: {e}")
+
+
+# 立即发送音频消息(reply_content)，不结束会话
+def tem_reply_Video_Url_Message(reply_content, e_context):
+    reply = Reply(ReplyType.VIDEO_URL, reply_content)
     e_context['channel'].send(reply, e_context["context"])

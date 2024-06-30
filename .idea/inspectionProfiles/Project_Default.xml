@@ -1,0 +1,54 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="755" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="24">
+            <item index="0" class="java.lang.String" itemvalue="flask_apscheduler" />
+            <item index="1" class="java.lang.String" itemvalue="fake_useragent" />
+            <item index="2" class="java.lang.String" itemvalue="curl_cffi" />
+            <item index="3" class="java.lang.String" itemvalue="Pygments" />
+            <item index="4" class="java.lang.String" itemvalue="anyio" />
+            <item index="5" class="java.lang.String" itemvalue="requests" />
+            <item index="6" class="java.lang.String" itemvalue="SpeechRecognition" />
+            <item index="7" class="java.lang.String" itemvalue="linkai" />
+            <item index="8" class="java.lang.String" itemvalue="zhipuai" />
+            <item index="9" class="java.lang.String" itemvalue="pyttsx3" />
+            <item index="10" class="java.lang.String" itemvalue="broadscope_bailian" />
+            <item index="11" class="java.lang.String" itemvalue="pydub" />
+            <item index="12" class="java.lang.String" itemvalue="numpy" />
+            <item index="13" class="java.lang.String" itemvalue="edge-tts" />
+            <item index="14" class="java.lang.String" itemvalue="dulwich" />
+            <item index="15" class="java.lang.String" itemvalue="azure-cognitiveservices-speech" />
+            <item index="16" class="java.lang.String" itemvalue="websocket-client" />
+            <item index="17" class="java.lang.String" itemvalue="baidu_aip" />
+            <item index="18" class="java.lang.String" itemvalue="google-generativeai" />
+            <item index="19" class="java.lang.String" itemvalue="wechatpy" />
+            <item index="20" class="java.lang.String" itemvalue="chatgpt_tool_hub" />
+            <item index="21" class="java.lang.String" itemvalue="anthropic" />
+            <item index="22" class="java.lang.String" itemvalue="gTTS" />
+            <item index="23" class="java.lang.String" itemvalue="dingtalk_stream" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N802" />
+          <option value="N803" />
+          <option value="N806" />
+          <option value="N801" />
+          <option value="N812" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
