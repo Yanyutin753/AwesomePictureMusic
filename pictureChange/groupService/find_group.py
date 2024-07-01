@@ -35,6 +35,6 @@ class find_group:
 
                     return ans_dic
             else:
-                return {"Error": "找不到目标群聊"}
+                return None
         else:
-            return {"Error": "未配置群聊"}
+            return None

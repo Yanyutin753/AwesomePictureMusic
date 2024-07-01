@@ -49,11 +49,11 @@ class GroupConfig:
                         "group_name]来新增群聊"
                         "\n删除群聊模式，请使用#del [group_name]来删除群聊\n"
                         "修改群聊模型模式，请使用#change [group_name] to [model]来修改模型")
-            if ins[:7] == "#modify":
-                self.mode = "all_function"
-                reply = self.change_command(ins)
-            elif ins[:7] == "#change":
+            if ins[:7] == "#change":
                 self.mode = "modify_group_function"
+                reply = self.change_command(ins)
+            elif ins[:13] == "#change Model":
+                self.mode = "modify_group_model"
                 reply = self.change_command(ins)
             elif ins[:4] == "#add":
                 self.mode = "add_group"
@@ -77,8 +77,7 @@ class GroupConfig:
 
         change_pattern = re.compile(r'^#modify (\w+) to (\w+)$')
         group_change_pattern = re.compile(r'^#change (\w+) in (.+) to (\w+)$')
-        model_change_pattern = re.compile(r'^#modify (.+) to (\w+)$')
-
+        model_change_pattern = re.compile(r'#modify (.+?) to (.+)')
         if self.mode == "all_function":
             change_match = change_pattern.match(command)
             if change_match:
@@ -183,7 +182,7 @@ class GroupConfig:
 
 # 测试代码
 manager = GroupConfig()
-print(manager.ins_command("#change IMAGE in 心鸣辩论群 to true"))
+print(manager.ins_command("#modify 500 Not Found to abab6.5s-chat"))
 # print(manager.ins_command("#add 505_b"))
 # print(manager.ins_command("#del 500 Not Found"))
 # print(Group_cache.get_cached_data())

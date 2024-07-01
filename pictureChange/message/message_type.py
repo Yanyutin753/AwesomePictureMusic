@@ -21,7 +21,7 @@ def in_image_reply(file_content, request_bot_name, role_options, use_stable_diff
         replyText += f"\n\n{request_bot_name}⭐ 暂不处理 {file_content}"
 
     else:
-        replyText = f"🥰 您的图片编号:\n💖 {file_content}\n\n❗ 请输入指令,以进行图片操作\n"
+        replyText = f"🥰 您的图片编号:\n💖 {file_content}\n\n❗ 请点击指令,以进行图片操作"
         if use_music_handle:
             replyText += ("\n\n<a href=\"weixin://bizmsgmenu?msgmenuid=1&msgmenucontent={}{} {}\">{}</a>".
                           format(request_bot_name, "🎧 图生音", file_content, "🎧 图生音"))

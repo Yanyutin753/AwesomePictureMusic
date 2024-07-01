@@ -8,12 +8,16 @@
         "唱",
         "帮我唱"
     ],
+    "image_create_prefix": [
+        "SD画",
+        "SD帮我画"
+    ],
     "is_use_fanyi": false,
     "file_url": "file=G:/sd/sd-webui-aki-v4.8/outputs/",
-    "baidu_api_key": "0fqG8cVm4GDlvYnyyrG04FDU",
-    "baidu_secret_key": "RQXZgD9j7hZqgse6x4NbxSU2GowiMiMk",
+    "baidu_api_key": "0fqG8crG04FDU",
+    "baidu_secret_key": "RQXZgD9j7hZqgse",
     "openai_api_base": "https://oneapi.clivia.fun/v1",
-    "openai_api_key": "sk-AaOG5NGs4VwGekTB622dA3F1Ff15442eAb737dD6F3C6Cb0a",
+    "openai_api_key": "sk-8toj6AnHN1ASCAzs65FdE8D792E749",
     "music_model": "suno-v3.5",
     "image_recognize_model": "gpt-4o",
     "file_recognize_model": "gpt-4o",
@@ -29,7 +33,7 @@
     },
     "defaults": {
         "params": {
-            "sampler_name": "Euler r",
+            "sampler_name": "Euler a",
             "steps": 20,
             "width": 1024,
             "height": 1024,

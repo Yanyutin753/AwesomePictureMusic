@@ -9,7 +9,7 @@ from plugins.pictureChange.message import message_reply as MessageReply, message
 from plugins.pictureChange.message.message_limit import MessageLimit
 from plugins.pictureChange.util import file_handle
 from plugins.pictureChange.work.common import Common
-from .adminService.adminService import adminService
+
 
 @plugins.register(name="pictureChange",
                   desc="百度AI 和 stable-diffusion webui 来 画图, 图生图, 音乐， 文件和图片识别，聊天模型转换",
@@ -46,7 +46,7 @@ class pictureChange(Plugin):
 
                 # 用于聊天操作
                 self.is_group_bot_name = conf().get("group_chat_prefix", [""])[0]
-                self.single_bot_name = conf().get("single_chat_reply_prefix", [""])[0]
+                self.single_bot_name = conf().get("single_chat_prefix", [""])[0]
                 self.other_user_id = config["use_group"]
 
                 # 用于翻译prompt
@@ -101,6 +101,7 @@ class pictureChange(Plugin):
                 self.max_size = int(config["max_size"])
                 self.use_pictureChange = config["use_pictureChange"]
                 self.music_create_prefix = config["music_create_prefix"]
+                self.image_create_prefix = config["image_create_prefix"]
                 self.use_stable_diffusion = config["use_stable_diffusion"]
                 self.use_music_handle = config["use_music_handle"]
                 self.use_file_handle = config["use_file_handle"]
@@ -134,7 +135,6 @@ class pictureChange(Plugin):
             MessageReply.reply_Text_Message(False, replyText, e_context)
             return
 
-
         channel = e_context['channel']
         if ReplyType.IMAGE in channel.NOT_SUPPORT_REPLYTYPE:
             return
@@ -143,61 +143,6 @@ class pictureChange(Plugin):
         context = e_context['context']
         context.get("msg").prepare()
         content = context.content.strip()
-
-        print(context)
-        sender_id = e_context.econtext["context"]["receiver"]
-
-        # 认证管理员
-        if content.startswith("认证"):
-            # 假设认证管理员的信息应该是:"认证 root"
-            # 分离参数
-            content1 = content.split(" ")
-            if content1 is None or len(content1) != 2:
-                return
-            if self.admin.verify_admin(sender_id, content1[1]):
-                replyText = "🥰认证成功"
-            else:
-                replyText = "😭认证失败,请重新认证"
-            MessageReply.reply_Text_Message(True, replyText, e_context)
-            return
-
-        if content.startswith("修改port"):
-            content1 = content.split(" ")
-            if len(content1) != 2:
-                return
-            self.admin.update_json(sender_id, "start", "port", value=content1[1])
-            self.port = content1[1]
-            replyText = f"🥰修改port成功，当前port为{self.port}"
-            MessageReply.reply_Text_Message(True, replyText, e_context)
-            return
-
-
-        if content.startswith("修改密码"):
-            content1 = content.split(" ")
-            if content1 is None or len(content1) != 2:
-                return
-            self.admin.update_password(sender_id, content1[1])
-            replyText = f"🥰修改密码成功"
-            MessageReply.reply_Text_Message(True, replyText, e_context)
-
-            return
-
-        if content.startswith("修改host"):
-            content1 = content.split(" ")
-            if len(content1) != 2:
-                return
-            self.admin.update_json(sender_id, "start", "host", value=content1[1])
-            self.host = content1[1]
-            replyText = f"🥰修改host成功，当前host为{self.host}"
-            MessageReply.reply_Text_Message(True, replyText, e_context)
-            return
-
-        # 清空管理员
-        if content.startswith("清空管理员"):
-            self.admin.clear_admin(sender_id)
-            replyText = "🥰清空管理员成功"
-            MessageReply.reply_Text_Message(True, replyText, e_context)
-            return
 
         # 初始化画图参数
         check_exist = False
@@ -239,7 +184,8 @@ class pictureChange(Plugin):
                 is_group_music = False
 
         request_bot_name = self.is_group_bot_name if is_group else self.single_bot_name
-        request_bot_name = request_bot_name + " "
+        if request_bot_name != "":
+            request_bot_name = request_bot_name + " "
 
         # 测试
         logger.debug(context)
@@ -284,8 +230,12 @@ class pictureChange(Plugin):
                     Common.process_init_image_url(request_bot_name, self.role_options, self.use_stable_diffusion,
                                                   self.use_music_handle, self.use_file_handle, self.is_wecom, e_context)
 
-                elif (e_context['context'].type == ContextType.IMAGE_CREATE and is_group_image
-                      and self.use_stable_diffusion):
+                elif (any(content.startswith(prefix) for prefix in self.image_create_prefix) 
+                      and is_group_image and self.use_stable_diffusion):
+                    content = next((content.replace(prefix, "") for prefix in self.image_create_prefix 
+                                    if content.startswith(prefix)),
+                                   content)
+                    e_context['context'].content = content
                     Common.process_image_create(self.is_use_fanyi, self.bot_prompt, self.rules, self.Model,
                                                 request_bot_name, self.start_args, self.default_params,
                                                 self.default_options, self.is_wecom, e_context)

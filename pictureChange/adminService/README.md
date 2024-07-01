@@ -3,6 +3,7 @@
 请将config.json.template修改为config.json后再进行使用。调用请初始化adminService类
 将此文件夹放入项目根目录下，调用时请使用相对路径
 ## 自身配置：
+
 ```json
 {
     "admin_id": [], # 管理员id，可以传入不同的特殊id作为表示符
